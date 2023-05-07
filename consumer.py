@@ -79,7 +79,7 @@ async def consume_messages():
     try:
         while True:
             message = await asyncio.to_thread(consumer.__next__)
-            await asyncio.sleep(30)
+            # await asyncio.sleep(30)
             print("Consuming.....")
             print("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition,
                                                   message.offset, message.key, message.value))
