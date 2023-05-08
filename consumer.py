@@ -57,18 +57,19 @@ import os
 import json
 from enum import Enum
 from time import sleep
-from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
+import asyncio
+from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 # channel
 topic = 'app'
 topicAKG = 'back'
 # consumer
-consumer = AIOKafkaConsumer(topic, bootstrap_servers=[
-                         'localhost:9092'], auto_offset_reset='latest', value_deserializer=lambda x: json.loads(x.decode('utf-8')))
+# consumer = AIOKafkaConsumer(topic, bootstrap_servers=[
+#                          'localhost:9092'], auto_offset_reset='latest', value_deserializer=lambda x: json.loads(x.decode('utf-8')))
 
-# producer
-consumer_producer = AIOKafkaProducer(bootstrap_servers=[
-                         'localhost:9092'], value_serializer=lambda x: json.dumps(x).encode('utf-8'))
+# # producer
+# consumer_producer = AIOKafkaProducer(bootstrap_servers=[
+#                          'localhost:9092'], value_serializer=lambda x: json.dumps(x).encode('utf-8'))
 
 def write_to_file(file, value):
     with open(f"{file}.json", "r+") as file:
@@ -89,26 +90,27 @@ def on_send_error(excp):
     # handle exception
     pass
 
-async def send_message_async(message):
-    await consumer_producer.send(topic, key=str.encode('UTF-8'), value=message.value)
+# async def send_message_async(message):
+#     await consumer_producer.send(topic, key=str.encode('UTF-8'), value=message.value)
+
+# 
 
 
-
-async def consume_messages():
-    try:
-        while True:
-            message = await asyncio.to_thread(consumer.__next__)
-            # await asyncio.sleep(30)
-            print("Consuming.....")
-            print("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition,
-                                                  message.offset, message.key, message.value))
-            print("sending from consumer to producer")
-            future = consumer_producer.send(topicAKG, key="HI".encode('UTF-8'), value=message.value)
-            future.add_callback(on_send_success)
-            future.add_errback(on_send_error)
-    finally:
-        consumer.close()
-        consumer_producer.close()
+# async def consume_messages():
+#     try:
+#         while True:
+#             message = await asyncio.to_thread(consumer.__next__)
+#             # await asyncio.sleep(30)
+#             print("Consuming.....")
+#             print("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition,
+#                                                   message.offset, message.key, message.value))
+#             print("sending from consumer to producer")
+#             future = consumer_producer.send(topicAKG, key="HI".encode('UTF-8'), value=message.value)
+#             future.add_callback(on_send_success)
+#             future.add_errback(on_send_error)
+#     finally:
+#         consumer.close()
+#         consumer_producer.close()
 
 # async def consume_messages():
 #     try:
@@ -138,17 +140,19 @@ async def consume_messages():
 #         # consumer_producer.close()
 
 
-def run_consumer():
-    loop = asyncio.get_event_loop()
-    try:
-        loop.create_task(consume_messages())
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        loop.close()
+# def run_consumer():
+#     loop = asyncio.get_event_loop()
+#     try:
+#         # loop.create_task(consume_messages())
+#         loop.run_until_complete(consume_messages())
+#     except KeyboardInterrupt:
+#         pass
+#     finally:
+#         loop.close()
 
 
-if __name__ == '__main__':
-    print("CONSUMER IS RUNNING...")
-    run_consumer()
+# if __name__ == '__main__':
+#     print("CONSUMER IS RUNNING...")
+#     run_consumer()
+loop = asyncio.get_event_loop()
+loop.run_until_complete(consume_messages())
