@@ -57,17 +57,17 @@ import os
 import json
 from enum import Enum
 from time import sleep
-from kafka import KafkaConsumer,KafkaProducer
+from aiokafka import AIOKafkaProducer, AIOKafkaConsumer
 
 # channel
 topic = 'app'
 topicAKG = 'back'
 # consumer
-consumer = KafkaConsumer(topic, bootstrap_servers=[
+consumer = AIOKafkaConsumer(topic, bootstrap_servers=[
                          'localhost:9092'], auto_offset_reset='latest', value_deserializer=lambda x: json.loads(x.decode('utf-8')))
 
 # producer
-consumer_producer = KafkaProducer(bootstrap_servers=[
+consumer_producer = AIOKafkaProducer(bootstrap_servers=[
                          'localhost:9092'], value_serializer=lambda x: json.dumps(x).encode('utf-8'))
 
 def write_to_file(file, value):

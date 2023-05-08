@@ -11,10 +11,9 @@ app = FastAPI()
 async def schedule_periodic():
     loop = asyncio.get_event_loop()
     try:
-        print("HI")
         # asyncio.ensure_future(producer_consume())
         # OR
-        # loop.create_task(producer_consume())
+        loop.create_task(producer_consume())
         # loop.run_forever()
     except KeyboardInterrupt:
         print(" EXECPTION HERE")

@@ -43,28 +43,12 @@ async def publish(method: str, body):
         producer.send(topic, key=method.encode('UTF-8'), value=data).add_callback(
             on_send_success).add_errback(on_send_error)
         print(f'Topic :{topic}  Key :{method}   published.')
-        # value = await kafka_consumer()
-        # print("VALUE", value)
+
     # block until all async messages are sent
     producer.flush()
 
 async def waiter():
     await asyncio.sleep(3)
-
-# async def kafka_consumer():
-#     # create a Kafka consumer instance
-#     consumer = KafkaConsumer(topicAKG, bootstrap_servers=[
-#                          'localhost:9092'], auto_offset_reset='latest', value_deserializer=lambda x: json.loads(x.decode('utf-8')))
-
-#     # await consumer.start()
-#     # consume messages from the Kafka topic
-#     for message in consumer:
-#         print(message)
-
-#     # close the consumer instance
-#     consumer.close()    
-
-
 
 async def producer_consume():
     # await consumer.start()
@@ -77,5 +61,4 @@ async def producer_consume():
     finally:
         print("HI")
         sys.exit(0)
-
-
+        
