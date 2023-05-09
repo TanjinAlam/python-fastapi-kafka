@@ -51,12 +51,17 @@ def on_send_error(excp):
 #     producer.flush()
 
 async def publish():
-    producer = AIOKafkaProducer(bootstrap_servers='localhost:9092')
+    producer = AIOKafkaProducer(bootstrap_servers='localhost:9092',
+    enable_idempotence=True)  
     await producer.start()
 
     consumer = AIOKafkaConsumer(
-        topicAKG,
-        bootstrap_servers='localhost:9092',group_id='my_consumer_group')
+    topicAKG,
+    bootstrap_servers='localhost:9092',group_id='test',
+    session_timeout_ms=60000,
+    rebalance_timeout_ms=30000,
+    max_poll_interval_ms=600000,
+    max_poll_records=100)
     await consumer.start()
 
     try:
@@ -65,6 +70,8 @@ async def publish():
             print(f"Iteration: {i}")
             async for message in consumer:
                 print("Received ========== ", message.value.decode())
+                await consumer.commit()
+                break
     finally:
         await producer.stop()
         await consumer.stop()

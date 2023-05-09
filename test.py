@@ -72,23 +72,26 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 # channel
 topic = 'app'
 topicAKG = 'back'
-# channel
-
 
 async def consume():
-    consumer = AIOKafkaConsumer(topic, bootstrap_servers='localhost:9092',group_id='my_consumer_group')
+    consumer = AIOKafkaConsumer(topic, bootstrap_servers='localhost:9092',
+    group_id="test",
+    session_timeout_ms=60000,
+    rebalance_timeout_ms=30000,
+    max_poll_interval_ms=600000,
+    max_poll_records=100)
     await consumer.start()
 
-    producer = AIOKafkaProducer(bootstrap_servers='localhost:9092')
+    producer = AIOKafkaProducer(bootstrap_servers='localhost:9092',
+                                enable_idempotence=True)
     await producer.start()
 
     try:
         async for message in consumer:
             print("Received",message.value.decode())
-            await asyncio.sleep(3)  # Delay for 3 seconds
+            await asyncio.sleep(5)  # Delay for 3 seconds
             await consumer.commit()  # Commit the offset to avoid re-consuming the same message
             await producer.send_and_wait(topicAKG, value='from consumer'.encode())
-
     finally:
         await consumer.stop()
         await producer.stop()
